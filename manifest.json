@@ -1,0 +1,87 @@
+{
+  "manifest_version": 3,
+  "name": "AskAll",
+  "version": "1.0.0",
+  "description": "Send your question to multiple AI chatbots at once, collect and compare all responses.",
+  "permissions": [
+    "tabs",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://www.perplexity.ai/*",
+    "https://gemini.google.com/*",
+    "https://manus.im/*",
+    "https://www.genspark.ai/*",
+    "https://agent.minimax.io/*",
+    "https://chat.deepseek.com/*",
+    "https://grok.com/*",
+    "https://www.kimi.com/*",
+    "https://www.qianwen.com/*",
+    "https://www.doubao.com/*",
+    "https://chat.mistral.ai/*",
+    "https://www.reddit.com/*",
+    "https://copilot.microsoft.com/*",
+    "https://www.meta.ai/*",
+    "https://yuanbao.tencent.com/*",
+    "https://chatglm.cn/*",
+    "https://yiyan.baidu.com/*",
+    "https://poe.com/*",
+    "https://huggingface.co/*",
+    "https://www.phind.com/*",
+    "https://claude.ai/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://www.perplexity.ai/*",
+        "https://gemini.google.com/*",
+        "https://manus.im/*",
+        "https://www.genspark.ai/*",
+        "https://agent.minimax.io/*",
+        "https://chat.deepseek.com/*",
+        "https://grok.com/*",
+        "https://www.kimi.com/*",
+        "https://www.qianwen.com/*",
+        "https://www.doubao.com/*",
+        "https://chat.mistral.ai/*",
+        "https://www.reddit.com/*",
+        "https://copilot.microsoft.com/*",
+        "https://www.meta.ai/*",
+        "https://yuanbao.tencent.com/*",
+        "https://chatglm.cn/*",
+        "https://yiyan.baidu.com/*",
+        "https://poe.com/*",
+        "https://huggingface.co/*",
+        "https://www.phind.com/*",
+        "https://claude.ai/*"
+      ],
+      "js": [
+        "content/site-adapters.js",
+        "content/content-script.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

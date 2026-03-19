@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AskAll</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+
+    <header class="header">
+      <h1 class="logo">AskAll</h1>
+      <span class="tagline">One question, every AI.</span>
+      <div class="header-controls">
+        <div class="size-switcher" title="Panel size">
+          <button class="size-btn" data-size="s">S</button>
+          <button class="size-btn active" data-size="m">M</button>
+          <button class="size-btn" data-size="l">L</button>
+        </div>
+        <div class="theme-switcher">
+          <button class="theme-btn" data-theme="light" title="Ink on paper">Light</button>
+          <button class="theme-btn active" data-theme="lumen" title="Warm clarity">Lumen</button>
+          <button class="theme-btn" data-theme="carbon" title="Industrial precision">Carbon</button>
+        </div>
+      </div>
+    </header>
+
+    <p class="notice"><strong>Please log in to each AI site beforehand.</strong> This extension does not handle login or authorization.</p>
+
+    <!-- question + history + templates toolbar -->
+    <section class="section">
+      <div class="label toolbar-label">
+        <span>Question</span>
+        <div class="toolbar-actions">
+          <button id="history-btn" class="toolbar-btn" title="Query history">History</button>
+          <button id="tpl-save-btn" class="toolbar-btn" title="Save as template">Save</button>
+          <button id="tpl-load-btn" class="toolbar-btn" title="Load template">Templates</button>
+        </div>
+      </div>
+      <textarea id="question" class="textarea" rows="4"
+        placeholder="What would you like to ask? (Ctrl+Enter to send)"></textarea>
+      <!-- history dropdown (hidden by default) -->
+      <div id="history-panel" class="dropdown-panel hidden"></div>
+      <!-- templates dropdown (hidden by default) -->
+      <div id="tpl-panel" class="dropdown-panel hidden"></div>
+    </section>
+
+    <section class="section">
+      <label class="label">Prompt Enhancement</label>
+      <div class="strategies">
+        <label class="chip">
+          <input type="checkbox" value="cot" class="strategy-cb">
+          <span>Chain-of-Thought</span>
+        </label>
+        <label class="chip">
+          <input type="checkbox" value="step" class="strategy-cb">
+          <span>Step-by-Step</span>
+        </label>
+        <label class="chip">
+          <input type="checkbox" value="expert" class="strategy-cb">
+          <span>Expert Role</span>
+        </label>
+        <label class="chip">
+          <input type="checkbox" value="concise" class="strategy-cb">
+          <span>Be Concise</span>
+        </label>
+        <label class="chip">
+          <input type="checkbox" value="compare" class="strategy-cb">
+          <span>Pros &amp; Cons</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="section">
+      <label class="label">
+        AI Providers
+        <button id="toggle-all-btn" class="toggle-all-btn" title="Toggle all">All</button>
+      </label>
+      <div id="site-list" class="site-list-grouped"></div>
+    </section>
+
+    <section class="section">
+      <label class="label" for="custom-sites">Custom Sites <span class="hint">(one URL per line, max 10)</span></label>
+      <textarea id="custom-sites" class="textarea textarea-sm" rows="2"
+        placeholder="https://example.com/chat"></textarea>
+    </section>
+
+    <div class="actions">
+      <button id="send-btn" class="btn btn-primary">Send to All</button>
+      <button id="collect-btn" class="btn btn-secondary" disabled>Collect</button>
+      <button id="reset-btn" class="btn btn-reset" title="Clear responses and start fresh">Reset</button>
+    </div>
+
+    <div id="status-bar" class="status-bar hidden">
+      <div class="status-text" id="status-text">
+        <span class="status-dot active"></span>
+        <span id="status-label">Waiting...</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill active" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <section id="responses-section" class="section hidden">
+      <div class="responses-header">
+        <label class="label">Responses</label>
+        <div class="responses-actions">
+          <button id="copy-debug-btn" class="btn btn-debug" title="Copy error diagnostics for debugging">Copy Debug</button>
+          <button id="export-md-btn" class="btn btn-export" title="Export as Markdown">Export MD</button>
+          <button id="copy-all-btn" class="btn btn-copy">Copy All</button>
+        </div>
+      </div>
+      <div id="responses-container" class="responses-container"></div>
+    </section>
+
+    <div id="toast" class="toast">
+      <span class="toast-icon">&#10003;</span>
+      <span id="toast-text">Copied to clipboard</span>
+    </div>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
