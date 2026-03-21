@@ -34,6 +34,7 @@
         { name: "Baidu Chat", url: "https://chat.baidu.com/search", hostname: "chat.baidu.com" },
         { name: "Sogou AI", url: "https://www.sogou.com/aimode", hostname: "www.sogou.com" },
         { name: "MiniMax", url: "https://agent.minimax.io/", hostname: "agent.minimax.io" },
+        { name: "MiMo", url: "https://aistudio.xiaomimimo.com/#/c", hostname: "aistudio.xiaomimimo.com" },
       ]
     },
     {

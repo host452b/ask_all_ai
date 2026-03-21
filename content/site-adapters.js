@@ -316,6 +316,18 @@ window.__ASKALL_ADAPTERS = {
       __askall_fillViaExecCommand(el, text);
     }
   },
+  "aistudio.xiaomimimo.com": {
+    inputSelector: 'textarea',
+    submitSelector: null,
+    responseSelector: '[class*="markdown"], [class*="message-content"], [class*="assistant"], [class*="response"], [class*="prose"]',
+    thinkingSelector: '[class*="loading"], [class*="generating"], [class*="typing"], [class*="stop"]',
+    useEnterToSubmit: true,
+    waitBeforeSubmit: 600,
+    fillInput(el, text) {
+      __askall_fillReactTextarea(el, text);
+    }
+  },
+
   "build.nvidia.com": {
     inputSelector: 'textarea, [contenteditable="true"][role="textbox"]',
     submitSelector: 'button[aria-label*="Send" i], button[aria-label*="submit" i], button[type="submit"], button[class*="send" i]',
