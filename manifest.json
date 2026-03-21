@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AskAll",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Send your question to multiple AI chatbots at once, collect and compare all responses.",
   "permissions": [
     "tabs",
@@ -29,7 +29,8 @@
     "https://www.sogou.com/*",
     "https://claude.ai/*",
     "https://duck.ai/*",
-    "https://build.nvidia.com/*"
+    "https://build.nvidia.com/*",
+    "https://aistudio.xiaomimimo.com/*"
   ],
   "optional_host_permissions": [
     "https://*/*"
@@ -67,7 +68,8 @@
         "https://www.sogou.com/*",
         "https://claude.ai/*",
         "https://duck.ai/*",
-        "https://build.nvidia.com/*"
+        "https://build.nvidia.com/*",
+        "https://aistudio.xiaomimimo.com/*"
       ],
       "js": [
         "content/site-adapters.js",
