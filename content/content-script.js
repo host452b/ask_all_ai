@@ -121,19 +121,20 @@
     if (el.disabled) { return true; }
     if (el.getAttribute("aria-disabled") === "true") { return true; }
     if (el.getAttribute("data-disabled") === "true") { return true; }
-    var cls = (el.className || "").toString().toLowerCase();
+    const cls = (el.className || "").toString().toLowerCase();
     if (cls.indexOf("disabled") >= 0) { return true; }
     return false;
   }
 
-  // simulate a realistic mouse click sequence to avoid bot detection.
-  // many tracking systems (e.g. baidu bioc/banti) check for
-  // pointerdown → mousedown → pointerup → mouseup → click chain.
-  function humanClick(el) {
-    var rect = el.getBoundingClientRect();
-    var cx = rect.left + rect.width / 2 + (Math.random() * 4 - 2);
-    var cy = rect.top + rect.height / 2 + (Math.random() * 4 - 2);
-    var shared = {
+  // dispatch the full pointer event sequence (pointerdown → mousedown →
+  // pointerup → mouseup → click) that SPA frameworks expect.  A bare
+  // el.click() is often insufficient because many UI toolkits only
+  // register interactions that include the complete event chain.
+  function dispatchClickSequence(el) {
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2 + (Math.random() * 4 - 2);
+    const cy = rect.top + rect.height / 2 + (Math.random() * 4 - 2);
+    const shared = {
       bubbles: true, cancelable: true, view: window,
       clientX: cx, clientY: cy, button: 0,
     };
@@ -250,8 +251,8 @@
         document.execCommand("insertText", false, question);
       }
 
-      // step 3: wait for framework to process input (with random jitter
-      // so the interval is not machine-detectable)
+      // step 3: wait for framework to process input (with small random
+      // variation to avoid colliding timers across tabs)
       const baseWait = adapter.waitBeforeSubmit || 500;
       const jitter = Math.floor(Math.random() * 600);
       await sleep(baseWait + jitter);
@@ -268,7 +269,7 @@
         for (let attempt = 0; attempt < 3 && !submitted; attempt++) {
           const btn = queryFirst(adapter.submitSelector);
           if (btn && !isElementDisabled(btn) && isElementVisible(btn)) {
-            humanClick(btn);
+            dispatchClickSequence(btn);
             submitted = true;
           }
           if (!submitted) { await sleep(STEP_DELAY_MS); }
@@ -278,7 +279,7 @@
         if (!submitted) {
           const nearby = findNearbySubmitButton(inputEl);
           if (nearby) {
-            humanClick(nearby);
+            dispatchClickSequence(nearby);
             submitted = true;
           }
         }
@@ -319,13 +320,13 @@
 
     const btn = queryFirst(adapter.submitSelector);
     if (btn && !isElementDisabled(btn) && isElementVisible(btn)) {
-      humanClick(btn);
+      dispatchClickSequence(btn);
       return true;
     }
 
     const nearby = findNearbySubmitButton(inputEl);
     if (nearby) {
-      humanClick(nearby);
+      dispatchClickSequence(nearby);
       return true;
     }
 
@@ -342,12 +343,12 @@
   function isStillThinking() {
     // check adapter-specific thinking selector
     if (adapter.thinkingSelector) {
-      var sels = adapter.thinkingSelector.split(",");
-      for (var s = 0; s < sels.length; s++) {
+      const sels = adapter.thinkingSelector.split(",");
+      for (let s = 0; s < sels.length; s++) {
         try {
-          var el = document.querySelector(sels[s].trim());
+          const el = document.querySelector(sels[s].trim());
           if (el && el.offsetParent !== null) {
-            var style = window.getComputedStyle(el);
+            const style = window.getComputedStyle(el);
             if (style.display !== "none" && style.visibility !== "hidden" && style.opacity !== "0") {
               return true;
             }
@@ -358,14 +359,14 @@
 
     // universal: visible "Stop" button = still streaming
     // only match actual stop-generation buttons, avoid false positives
-    var stopSelectors = [
+    const stopSelectors = [
       'button[aria-label*="Stop" i]',
       'button[aria-label*="stop" i]',
       'button[aria-label*="停止" i]',
     ];
-    for (var i = 0; i < stopSelectors.length; i++) {
+    for (let i = 0; i < stopSelectors.length; i++) {
       try {
-        var btn = document.querySelector(stopSelectors[i]);
+        const btn = document.querySelector(stopSelectors[i]);
         if (btn && btn.offsetParent !== null) { return true; }
       } catch (_) { /* skip */ }
     }
@@ -373,13 +374,13 @@
     return false;
   }
 
-  var UI_NOISE = /^(Copy|Copied|复制|已复制|Retry|重试|Edit|编辑|Share|分享|Like|Dislike|Good|Bad|👍|👎)[\s]*$/;
+  const UI_NOISE = /^(Copy|Copied|复制|已复制|Retry|重试|Edit|编辑|Share|分享|Like|Dislike|Good|Bad|👍|👎)[\s]*$/;
 
   function cleanResponseText(text) {
     if (!text) { return ""; }
     return text
       .split("\n")
-      .filter(function(line) { return !UI_NOISE.test(line.trim()); })
+      .filter((line) => !UI_NOISE.test(line.trim()))
       .join("\n")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
@@ -388,25 +389,25 @@
   function extractLatestResponse() {
     try {
       // primary: precise selector extraction
-      var elements = queryAll(adapter.responseSelector);
+      const elements = queryAll(adapter.responseSelector);
       if (elements.length > 0) {
-        var lastEl = elements[elements.length - 1];
-        var text = cleanResponseText(lastEl.innerText || lastEl.textContent || "");
+        const lastEl = elements[elements.length - 1];
+        const text = cleanResponseText(lastEl.innerText || lastEl.textContent || "");
         if (text.length > 10) { return text; }
       }
 
       // fallback: main content area minus sidebar/nav/header noise
-      var noiseSelector = "nav, aside, header, footer, [class*='sidebar'], [class*='history'], [class*='nav-'], [class*='side-'], [role='navigation'], [role='banner'], [role='contentinfo']";
-      var noiseEls = document.querySelectorAll(noiseSelector);
-      var noise = new Set();
-      for (var i = 0; i < noiseEls.length; i++) { noise.add(noiseEls[i]); }
+      const noiseSelector = "nav, aside, header, footer, [class*='sidebar'], [class*='history'], [class*='nav-'], [class*='side-'], [role='navigation'], [role='banner'], [role='contentinfo']";
+      const noiseEls = document.querySelectorAll(noiseSelector);
+      const noise = new Set();
+      for (let i = 0; i < noiseEls.length; i++) { noise.add(noiseEls[i]); }
 
-      var main = document.querySelector("main, [role='main'], [class*='chat-container'], [class*='conversation'], [id*='message']") || document.body;
-      var walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
-      var result = "";
+      const main = document.querySelector("main, [role='main'], [class*='chat-container'], [class*='conversation'], [id*='message']") || document.body;
+      const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
+      let result = "";
       while (walker.nextNode()) {
-        var skip = false;
-        var parent = walker.currentNode.parentElement;
+        let skip = false;
+        let parent = walker.currentNode.parentElement;
         while (parent && parent !== main) {
           if (noise.has(parent)) { skip = true; break; }
           parent = parent.parentElement;
@@ -462,8 +463,8 @@
         lastSentText = currentText;
       }
 
-      var normalDone = !thinking && isNewResponse && stabilityCounter >= STABILITY_THRESHOLD && currentText.length > 0;
-      var forceDone = isNewResponse && stabilityCounter >= STABILITY_THRESHOLD_FORCE && currentText.length > 0;
+      const normalDone = !thinking && isNewResponse && stabilityCounter >= STABILITY_THRESHOLD && currentText.length > 0;
+      const forceDone = isNewResponse && stabilityCounter >= STABILITY_THRESHOLD_FORCE && currentText.length > 0;
       if (normalDone || forceDone) {
         stopPolling();
         sendStatus("done", currentText, STABILITY_THRESHOLD);
@@ -499,12 +500,12 @@
 
   function captureDomSnapshot(inputEl) {
     try {
-      var snapshot = {};
+      const snapshot = {};
 
       // capture the input area's parent context (3 levels up)
       if (inputEl) {
-        var ctx = inputEl.parentElement;
-        for (var i = 0; i < 3 && ctx && ctx !== document.body; i++) {
+        let ctx = inputEl.parentElement;
+        for (let i = 0; i < 3 && ctx && ctx !== document.body; i++) {
           ctx = ctx.parentElement;
         }
         if (ctx) {
@@ -513,23 +514,23 @@
       }
 
       // capture all textareas and contenteditable elements
-      var inputs = [];
-      document.querySelectorAll('textarea, [contenteditable="true"], [role="textbox"]').forEach(function(el) {
+      const inputs = [];
+      document.querySelectorAll('textarea, [contenteditable="true"], [role="textbox"]').forEach((el) => {
         inputs.push({
           tag: el.tagName,
           id: el.id || "",
           class: (el.className || "").toString().slice(0, 100),
           placeholder: el.placeholder || "",
           contentEditable: el.contentEditable,
-          dataAttrs: Array.from(el.attributes).filter(function(a) { return a.name.startsWith("data-"); }).map(function(a) { return a.name + "=" + a.value.slice(0, 30); }).join(", "),
+          dataAttrs: Array.from(el.attributes).filter((a) => a.name.startsWith("data-")).map((a) => a.name + "=" + a.value.slice(0, 30)).join(", "),
           visible: isElementVisible(el),
         });
       });
       snapshot.allInputs = inputs;
 
       // capture elements with "send" in class/id/aria-label
-      var sendEls = [];
-      document.querySelectorAll('[class*="send"], [id*="send"], [aria-label*="Send"], [aria-label*="send"], [aria-label*="Submit"], [data-testid*="send"]').forEach(function(el) {
+      const sendEls = [];
+      document.querySelectorAll('[class*="send"], [id*="send"], [aria-label*="Send"], [aria-label*="send"], [aria-label*="Submit"], [data-testid*="send"]').forEach((el) => {
         sendEls.push({
           tag: el.tagName,
           id: el.id || "",
@@ -560,7 +561,7 @@
       const thinkingEl = queryFirst(adapter.thinkingSelector);
 
       // input element details
-      var inputInfo = null;
+      let inputInfo = null;
       if (inputEl) {
         inputInfo = {
           tag: inputEl.tagName,
@@ -576,7 +577,7 @@
       }
 
       // submit button details
-      var submitInfo = null;
+      let submitInfo = null;
       if (submitEl) {
         submitInfo = {
           tag: submitEl.tagName,
@@ -593,26 +594,24 @@
       }
 
       // response elements summary
-      var responseInfo = responseEls.slice(-3).map(function(el, i) {
-        return {
-          index: responseEls.length - 3 + i,
-          tag: el.tagName,
-          className: (el.className || "").toString().slice(0, 80),
-          textLength: (el.innerText || "").length,
-        };
-      });
+      const responseInfo = responseEls.slice(-3).map((el, i) => ({
+        index: responseEls.length - 3 + i,
+        tag: el.tagName,
+        className: (el.className || "").toString().slice(0, 80),
+        textLength: (el.innerText || "").length,
+      }));
 
       // page-level error/alert/warning hints
-      var errorHints = [];
-      var errorSelectors = [
+      const errorHints = [];
+      const errorSelectors = [
         '[class*="error"]', '[class*="alert"]', '[class*="warning"]',
         '[role="alert"]', '[class*="notice"]', '[class*="fail"]',
         '[class*="captcha"]', '[class*="login"]', '[class*="sign-in"]',
       ];
-      for (var idx = 0; idx < errorSelectors.length; idx++) {
+      for (let idx = 0; idx < errorSelectors.length; idx++) {
         try {
-          document.querySelectorAll(errorSelectors[idx]).forEach(function(el) {
-            var text = (el.innerText || "").trim();
+          document.querySelectorAll(errorSelectors[idx]).forEach((el) => {
+            const text = (el.innerText || "").trim();
             if (text && text.length > 0 && text.length < 500) {
               errorHints.push(text);
             }
@@ -621,12 +620,12 @@
       }
 
       // all buttons on page (for debugging submit issues)
-      var allButtons = [];
+      const allButtons = [];
       try {
-        document.querySelectorAll("button, [role='button']").forEach(function(btn) {
-          var label = btn.getAttribute("aria-label") || "";
-          var text = (btn.textContent || "").trim().slice(0, 40);
-          var cls = (btn.className || "").toString().slice(0, 60);
+        document.querySelectorAll("button, [role='button']").forEach((btn) => {
+          const label = btn.getAttribute("aria-label") || "";
+          const text = (btn.textContent || "").trim().slice(0, 40);
+          const cls = (btn.className || "").toString().slice(0, 60);
           if (label || text) {
             allButtons.push({
               tag: btn.tagName,

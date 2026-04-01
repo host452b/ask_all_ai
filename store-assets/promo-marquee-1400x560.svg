@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#09090b"/>
+      <stop offset="50%" style="stop-color:#12121a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7c6aff"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="560" fill="url(#bg)"/>
+  <!-- large decorative glows -->
+  <circle cx="1200" cy="100" r="300" fill="rgba(124,106,255,0.04)"/>
+  <circle cx="200" cy="480" r="250" fill="rgba(124,106,255,0.03)"/>
+  <circle cx="700" cy="280" r="200" fill="rgba(124,106,255,0.02)"/>
+
+  <!-- left section: branding -->
+  <text x="120" y="200" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="72" font-weight="800" fill="#f0f0f5">
+    Ask<tspan fill="url(#accent)">All</tspan>
+  </text>
+  <text x="120" y="250" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="24" fill="rgba(240,240,245,0.6)">One question, every AI.</text>
+  <text x="120" y="300" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="16" fill="rgba(240,240,245,0.35)">Send your question to 22+ AI chatbots at once and compare all responses side by side.</text>
+
+  <!-- provider pills row 1 -->
+  <g font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="14" font-weight="500">
+    <rect x="120" y="340" width="88" height="32" rx="16" fill="rgba(124,106,255,0.15)" stroke="rgba(124,106,255,0.3)" stroke-width="1"/>
+    <text x="164" y="361" text-anchor="middle" fill="#a78bfa">ChatGPT</text>
+    <rect x="218" y="340" width="78" height="32" rx="16" fill="rgba(124,106,255,0.15)" stroke="rgba(124,106,255,0.3)" stroke-width="1"/>
+    <text x="257" y="361" text-anchor="middle" fill="#a78bfa">Gemini</text>
+    <rect x="306" y="340" width="74" height="32" rx="16" fill="rgba(124,106,255,0.15)" stroke="rgba(124,106,255,0.3)" stroke-width="1"/>
+    <text x="343" y="361" text-anchor="middle" fill="#a78bfa">Claude</text>
+    <rect x="390" y="340" width="62" height="32" rx="16" fill="rgba(124,106,255,0.15)" stroke="rgba(124,106,255,0.3)" stroke-width="1"/>
+    <text x="421" y="361" text-anchor="middle" fill="#a78bfa">Grok</text>
+    <rect x="462" y="340" width="90" height="32" rx="16" fill="rgba(124,106,255,0.15)" stroke="rgba(124,106,255,0.3)" stroke-width="1"/>
+    <text x="507" y="361" text-anchor="middle" fill="#a78bfa">DeepSeek</text>
+  </g>
+  <!-- provider pills row 2 -->
+  <g font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="14" font-weight="500">
+    <rect x="120" y="382" width="90" height="32" rx="16" fill="rgba(124,106,255,0.10)" stroke="rgba(124,106,255,0.2)" stroke-width="1"/>
+    <text x="165" y="403" text-anchor="middle" fill="rgba(167,139,250,0.7)">Perplexity</text>
+    <rect x="220" y="382" width="74" height="32" rx="16" fill="rgba(124,106,255,0.10)" stroke="rgba(124,106,255,0.2)" stroke-width="1"/>
+    <text x="257" y="403" text-anchor="middle" fill="rgba(167,139,250,0.7)">Mistral</text>
+    <rect x="304" y="382" width="58" height="32" rx="16" fill="rgba(124,106,255,0.10)" stroke="rgba(124,106,255,0.2)" stroke-width="1"/>
+    <text x="333" y="403" text-anchor="middle" fill="rgba(167,139,250,0.7)">Kimi</text>
+    <rect x="372" y="382" width="66" height="32" rx="16" fill="rgba(124,106,255,0.10)" stroke="rgba(124,106,255,0.2)" stroke-width="1"/>
+    <text x="405" y="403" text-anchor="middle" fill="rgba(167,139,250,0.7)">Copilot</text>
+    <rect x="448" y="382" width="88" height="32" rx="16" fill="rgba(124,106,255,0.10)" stroke="rgba(124,106,255,0.2)" stroke-width="1"/>
+    <text x="492" y="403" text-anchor="middle" fill="rgba(167,139,250,0.7)">+12 more</text>
+  </g>
+
+  <!-- right section: mock UI cards -->
+  <g transform="translate(700, 80)">
+    <!-- card 1 -->
+    <rect x="0" y="0" width="580" height="120" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <circle cx="28" cy="28" r="10" fill="rgba(124,106,255,0.3)"/>
+    <text x="46" y="33" font-family="-apple-system,sans-serif" font-size="14" font-weight="600" fill="#f0f0f5">ChatGPT</text>
+    <rect x="540" y="18" width="24" height="18" rx="9" fill="rgba(74,222,128,0.2)"/>
+    <text x="552" y="31" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#4ade80">OK</text>
+    <text x="20" y="60" font-family="-apple-system,sans-serif" font-size="12" fill="rgba(240,240,245,0.5)">The key differences between Python and JavaScript include</text>
+    <text x="20" y="78" font-family="-apple-system,sans-serif" font-size="12" fill="rgba(240,240,245,0.5)">their typing systems, execution environments, and primary</text>
+    <text x="20" y="96" font-family="-apple-system,sans-serif" font-size="12" fill="rgba(240,240,245,0.5)">use cases. Python uses dynamic strong typing while JS...</text>
+    <text x="20" y="112" font-family="-apple-system,sans-serif" font-size="10" fill="rgba(240,240,245,0.25)">284 words  ·  12s</text>
+
+    <!-- card 2 -->
+    <rect x="0" y="135" width="580" height="120" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <circle cx="28" cy="163" r="10" fill="rgba(56,189,248,0.3)"/>
+    <text x="46" y="168" font-family="-apple-system,sans-serif" font-size="14" font-weight="600" fill="#f0f0f5">Gemini</text>
+    <rect x="540" y="153" width="24" height="18" rx="9" fill="rgba(74,222,128,0.2)"/>
+    <text x="552" y="166" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#4ade80">OK</text>
+    <text x="20" y="195" font-family="-apple-system,sans-serif" font-size="12" fill="rgba(240,240,245,0.5)">Great question! Python and JavaScript differ in several</text>
+    <text x="20" y="213" font-family="-apple-system,sans-serif" font-size="12" fill="rgba(240,240,245,0.5)">fundamental ways: 1) Type system — Python is strongly</text>
+    <text x="20" y="231" font-family="-apple-system,sans-serif" font-size="12" fill="rgba(240,240,245,0.5)">typed while JavaScript is weakly typed, meaning...</text>
+    <text x="20" y="247" font-family="-apple-system,sans-serif" font-size="10" fill="rgba(240,240,245,0.25)">312 words  ·  8s</text>
+
+    <!-- card 3 -->
+    <rect x="0" y="270" width="580" height="120" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <circle cx="28" cy="298" r="10" fill="rgba(251,146,60,0.3)"/>
+    <text x="46" y="303" font-family="-apple-system,sans-serif" font-size="14" font-weight="600" fill="#f0f0f5">Claude</text>
+    <rect x="520" y="288" width="44" height="18" rx="9" fill="rgba(250,204,21,0.15)"/>
+    <text x="542" y="301" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#facc15">streaming</text>
+    <text x="20" y="330" font-family="-apple-system,sans-serif" font-size="12" fill="rgba(240,240,245,0.5)">Python and JavaScript serve different ecosystems.</text>
+    <text x="20" y="348" font-family="-apple-system,sans-serif" font-size="12" fill="rgba(240,240,245,0.5)">Python dominates in data science, ML, and backend</text>
+    <text x="20" y="366" font-family="-apple-system,sans-serif" font-size="12" fill="rgba(240,240,245,0.4)">services, while JavaScript is the language of the web...</text>
+    <text x="20" y="382" font-family="-apple-system,sans-serif" font-size="10" fill="rgba(240,240,245,0.25)">198 words  ·  streaming...</text>
+  </g>
+
+  <!-- bottom tagline -->
+  <text x="700" y="530" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="14" fill="rgba(240,240,245,0.25)">Free &amp; open source  ·  No tracking  ·  All data stays in your browser</text>
+</svg>

@@ -2030,3 +2030,57 @@ button:focus:not(:focus-visible) {
 .tpl-save-confirm:hover {
   opacity: 0.85;
 }
+
+/* ===== disclaimer overlay ===== */
+.disclaimer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+}
+.disclaimer-overlay.hidden { display: none; }
+.disclaimer-box {
+  background: var(--bg, #111);
+  border: 1px solid var(--border, #333);
+  border-radius: var(--radius-lg, 12px);
+  padding: 28px 32px;
+  max-width: 480px;
+  width: 90%;
+  color: var(--text, #f0f0f5);
+}
+.disclaimer-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.disclaimer-list {
+  padding-left: 18px;
+  margin-bottom: 20px;
+  line-height: 1.7;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #aaa);
+}
+.disclaimer-list li { margin-bottom: 6px; }
+.disclaimer-list strong { color: var(--text, #f0f0f5); }
+.disclaimer-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.disclaimer-check input { cursor: pointer; }
+#disclaimer-continue {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.92rem;
+}
+#disclaimer-continue:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

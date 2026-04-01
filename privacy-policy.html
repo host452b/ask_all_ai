@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AskAll — Privacy Policy</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.7; color: #222; }
+    h1 { font-size: 1.6rem; border-bottom: 2px solid #e5e5e5; padding-bottom: 8px; }
+    h2 { font-size: 1.15rem; margin-top: 2em; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background: #f7f7f7; }
+    code { background: #f0f0f0; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+    .updated { color: #888; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+
+<h1>AskAll &mdash; Privacy Policy</h1>
+<p class="updated">Last updated: 2026-03-21</p>
+
+<h2>Overview</h2>
+<p>AskAll is a browser extension that helps you send a question to multiple AI chatbot websites simultaneously and compare their responses side by side. We are committed to protecting your privacy. This policy explains what data AskAll accesses, how it is used, and where it is stored.</p>
+
+<h2>Data We Collect</h2>
+<p><strong>AskAll does not collect, transmit, or store any personal data on external servers.</strong> All data remains entirely within your browser using the Chrome <code>storage.local</code> API.</p>
+
+<table>
+  <thead>
+    <tr><th>Data</th><th>Purpose</th><th>Storage</th><th>Retention</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Your questions</td>
+      <td>Sent to the AI websites you select, saved locally for query history</td>
+      <td>Browser local storage only</td>
+      <td>Last 50 queries; clearable via History &gt; Clear All</td>
+    </tr>
+    <tr>
+      <td>AI responses</td>
+      <td>Displayed in the extension UI for comparison</td>
+      <td>In-memory only (not persisted)</td>
+      <td>Cleared when you close the extension or click Reset</td>
+    </tr>
+    <tr>
+      <td>Site selection preferences</td>
+      <td>Remember which AI providers you enabled</td>
+      <td>Browser local storage only</td>
+      <td>Until you change them</td>
+    </tr>
+    <tr>
+      <td>Prompt templates</td>
+      <td>Save reusable question templates</td>
+      <td>Browser local storage only</td>
+      <td>Until you delete them (max 30)</td>
+    </tr>
+    <tr>
+      <td>Theme preference</td>
+      <td>Remember your chosen UI theme</td>
+      <td>Browser local storage only</td>
+      <td>Until you change it</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Third-Party Websites</h2>
+<p>When you click "Send to All", AskAll opens tabs to the AI chatbot websites you selected and types your question into their input fields. <strong>Your question is sent directly from your browser to each AI provider's website</strong> &mdash; it does not pass through any intermediary server controlled by AskAll.</p>
+<p>Each AI provider has its own privacy policy and terms of service. AskAll does not modify, intercept, or store the data exchanged between your browser and these websites beyond what is displayed in the extension UI. We encourage you to review each provider's privacy policy.</p>
+
+<h2>Permissions Explained</h2>
+<table>
+  <thead>
+    <tr><th>Permission</th><th>Why It's Needed</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>tabs</code></td>
+      <td>Create, switch between, and close browser tabs for each AI chatbot site.</td>
+    </tr>
+    <tr>
+      <td><code>scripting</code></td>
+      <td>Inject content scripts into AI chatbot pages to fill in your question and collect the response.</td>
+    </tr>
+    <tr>
+      <td><code>storage</code></td>
+      <td>Save your preferences, query history, and templates locally in your browser.</td>
+    </tr>
+    <tr>
+      <td>Host permissions (per AI site)</td>
+      <td>Required for each supported AI website so the extension can interact with the page DOM. Only the specific sites listed in the extension are accessed.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Data Sharing</h2>
+<p>AskAll does <strong>not</strong>:</p>
+<ul>
+  <li>Send any data to servers owned or operated by AskAll</li>
+  <li>Use analytics, tracking, or telemetry of any kind</li>
+  <li>Share data with third parties beyond the AI websites you explicitly choose to query</li>
+  <li>Access any data on websites other than the AI chatbot sites you select</li>
+</ul>
+
+<h2>Data Security</h2>
+<p>All data is stored using the browser's built-in <code>chrome.storage.local</code> API, which is sandboxed to the extension and inaccessible to other extensions or websites. No encryption beyond the browser's native protections is applied, as no data leaves your device.</p>
+
+<h2>Your Rights</h2>
+<p>You can delete all locally stored data at any time by:</p>
+<ul>
+  <li>Clicking <strong>Reset</strong> in the extension to clear current session data</li>
+  <li>Clicking <strong>History &gt; Clear All</strong> to remove query history</li>
+  <li>Uninstalling the extension, which removes all associated local storage</li>
+</ul>
+
+<h2>Children's Privacy</h2>
+<p>AskAll is not directed at children under 13. We do not knowingly collect any information from children.</p>
+
+<h2>Changes to This Policy</h2>
+<p>If we update this privacy policy, the updated version will be published at this URL with a new "Last updated" date. Continued use of the extension after changes constitutes acceptance of the updated policy.</p>
+
+<h2>Contact</h2>
+<p>If you have questions about this privacy policy, please open an issue on our <a href="https://github.com/AskAll-AI/ask-all/issues">GitHub repository</a>.</p>
+
+</body>
+</html>
