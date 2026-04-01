@@ -1,0 +1,20 @@
+# Build output
+dist/
+
+# OS files
+.DS_Store
+__MACOSX/
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Dependencies
+node_modules/
+
+# Archives
+*.zip

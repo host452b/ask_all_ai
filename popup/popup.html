@@ -156,6 +156,25 @@
     <span id="toast-text">Copied to clipboard</span>
   </div>
 
+  <!-- first-use disclaimer overlay -->
+  <div id="disclaimer-overlay" class="disclaimer-overlay hidden">
+    <div class="disclaimer-box">
+      <h2 class="disclaimer-title">Before You Start</h2>
+      <ul class="disclaimer-list">
+        <li>AskAll automates typing your question into AI chatbot websites and collecting their responses.</li>
+        <li>You must be <strong>logged in</strong> to each AI service beforehand. AskAll does not bypass logins, paywalls, or usage limits.</li>
+        <li>Your questions are sent <strong>directly from your browser</strong> to each AI provider. No data passes through AskAll servers.</li>
+        <li>Use of each AI service is subject to that provider's own Terms of Service.</li>
+        <li>All preferences and history are stored <strong>locally in your browser</strong> only.</li>
+      </ul>
+      <label class="disclaimer-check">
+        <input type="checkbox" id="disclaimer-agree">
+        <span>I understand and agree</span>
+      </label>
+      <button id="disclaimer-continue" class="btn btn-send" disabled>Continue</button>
+    </div>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>

@@ -71,6 +71,10 @@
   };
 
   const MAX_CUSTOM_SITES = 10;
+
+  // must match content-script.js STABILITY_THRESHOLD and POLL_INTERVAL_MS
+  const STABILITY_THRESHOLD = 10;
+  const POLL_INTERVAL_SEC = 6;
   const STORAGE_KEY_SITES = "askall_selected_sites";
   const STORAGE_KEY_TEMPLATES = "askall_templates";
   const STORAGE_KEY_STRATEGIES = "askall_strategies";
@@ -106,7 +110,6 @@
   const tplLoadBtn = document.getElementById("tpl-load-btn");
   const tplPanel = document.getElementById("tpl-panel");
 
-  let pollIntervalId = null;
   let autoRefreshId = null;
   let autoRefreshActive = false;
   let allSelected = true;
@@ -206,6 +209,32 @@
   customSitesEl.addEventListener("input", () => {
     storageSet({ [STORAGE_KEY_CUSTOM_SITES]: customSitesEl.value });
   });
+
+  // ============================================================
+  //  FIRST-USE DISCLAIMER
+  // ============================================================
+
+  const STORAGE_KEY_DISCLAIMER = "askall_disclaimer_accepted";
+  const disclaimerOverlay = document.getElementById("disclaimer-overlay");
+  const disclaimerAgree = document.getElementById("disclaimer-agree");
+  const disclaimerContinue = document.getElementById("disclaimer-continue");
+
+  if (disclaimerOverlay && disclaimerAgree && disclaimerContinue) {
+    storageGet(STORAGE_KEY_DISCLAIMER, (r) => {
+      if (r && r[STORAGE_KEY_DISCLAIMER]) { return; }
+      disclaimerOverlay.classList.remove("hidden");
+    });
+
+    disclaimerAgree.addEventListener("change", () => {
+      disclaimerContinue.disabled = !disclaimerAgree.checked;
+    });
+
+    disclaimerContinue.addEventListener("click", () => {
+      if (!disclaimerAgree.checked) { return; }
+      storageSet({ [STORAGE_KEY_DISCLAIMER]: true });
+      disclaimerOverlay.classList.add("hidden");
+    });
+  }
 
   // ============================================================
   //  MICRO-INTERACTIONS
@@ -554,27 +583,65 @@
     } catch (_) { return false; }
   }
 
-  function getSelectedUrls() {
+  function getBuiltinUrls() {
     const urls = [];
     siteListEl.querySelectorAll(".site-item").forEach((item) => {
       const cb = item.querySelector('input[type="checkbox"]');
       if (cb.checked) { urls.push(item.dataset.url); }
     });
-    const custom = customSitesEl.value.split("\n").map((l) => l.trim()).filter(isValidUrl).slice(0, MAX_CUSTOM_SITES);
-    return urls.concat(custom);
+    return urls;
+  }
+
+  function getCustomUrls() {
+    return customSitesEl.value.split("\n").map((l) => l.trim()).filter(isValidUrl).slice(0, MAX_CUSTOM_SITES);
+  }
+
+  function getSelectedUrls() {
+    return getBuiltinUrls().concat(getCustomUrls());
+  }
+
+  // request host permissions for custom URLs that aren't already granted
+  function ensureCustomPermissions(customUrls) {
+    if (customUrls.length === 0) { return Promise.resolve(true); }
+    const origins = customUrls.map((url) => {
+      try { return new URL(url).origin + "/*"; } catch (_) { return null; }
+    }).filter(Boolean);
+    if (origins.length === 0) { return Promise.resolve(true); }
+    return new Promise((resolve) => {
+      chrome.permissions.request({ origins }, (granted) => {
+        resolve(granted);
+      });
+    });
   }
 
   // ============================================================
   //  SEND
   // ============================================================
 
-  sendBtn.addEventListener("click", () => {
+  sendBtn.addEventListener("click", async () => {
     if (sendInFlight) { return; }
 
     const question = buildQuestion();
     if (!question) { shakeElement(questionEl); questionEl.focus(); return; }
 
-    const urls = getSelectedUrls();
+    const builtinUrls = getBuiltinUrls();
+    const customUrls = getCustomUrls();
+
+    // request permissions for custom sites before proceeding
+    if (customUrls.length > 0) {
+      const granted = await ensureCustomPermissions(customUrls);
+      if (!granted) {
+        showToast("Permission denied for custom sites — they will be skipped.");
+        if (builtinUrls.length === 0) {
+          shakeElement(toggleAllBtn);
+          return;
+        }
+      }
+    }
+
+    const urls = builtinUrls.concat(
+      customUrls.length > 0 ? customUrls : []
+    );
     if (urls.length === 0) { shakeElement(toggleAllBtn); return; }
 
     sendInFlight = true;
@@ -737,21 +804,13 @@
 
   function startPolling() {
     stopPolling();
-    pollIntervalId = setInterval(fetchStatus, 6000);
     startAutoRefresh();
     startEtaCountdown();
   }
 
   function stopPolling() {
-    if (pollIntervalId) { clearInterval(pollIntervalId); pollIntervalId = null; }
     stopAutoRefresh();
     stopEtaCountdown();
-  }
-
-  function fetchStatus() {
-    sendMsg({ type: "ASKALL_GET_STATUS" }, (resp) => {
-      if (resp && resp.tabs) { updateResponseCards(resp.tabs); }
-    });
   }
 
   function startAutoRefresh() {
@@ -990,7 +1049,7 @@
         statusEl.textContent = "error";
       } else if (isPolling && info.stabilityProgress > 0) {
         statusEl.classList.add("confirming");
-        const secLeft = (10 - info.stabilityProgress) * 6;
+        const secLeft = (STABILITY_THRESHOLD - info.stabilityProgress) * POLL_INTERVAL_SEC;
         statusEl.textContent = `confirming ${info.stabilityProgress}/10 · ${secLeft}s`;
       } else if (isPolling) {
         statusEl.classList.add("polling");
@@ -1051,7 +1110,7 @@
       if (isFinal) { continue; }
       const progress = info.stabilityProgress || 0;
       if (progress > 0) {
-        const remaining = (10 - progress) * 6;
+        const remaining = (STABILITY_THRESHOLD - progress) * POLL_INTERVAL_SEC;
         if (remaining > maxConfirmingSec) { maxConfirmingSec = remaining; }
       } else {
         streamingCount++;

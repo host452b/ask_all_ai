@@ -10,12 +10,8 @@ const MAX_RESPONSE_LENGTH = 500000;
 const MAX_HISTORY_ITEMS = 50;
 const BATCH_SIZE = 10;
 const BATCH_DELAY_MS = 1500;
-const TAB_WARM_ROUNDS = 3;
+const TAB_WARM_ROUNDS = 2;
 const TAB_WARM_INTERVAL_MS = 10000;
-const TAB_WARM_FOCUS_MS = 800;
-const TAB_WARM_POST_ACTION_MS = 500;
-const SLOW_SITE_EXTRA_DELAY_MS = 5000;
-const SLOW_SITE_HOSTNAMES = [];
 
 // { tabId -> { url, hostname, status, response, createdAt, doneAt } }
 let activeTabs = {};
@@ -285,10 +281,8 @@ async function openAndInject(url, question) {
     return tabId;
   }
 
-  // slow sites (anti-bot, delayed loading) need extra wait
-  var isSlowSite = SLOW_SITE_HOSTNAMES.includes(hostname);
-  var spaDelay = isSlowSite ? 1500 + SLOW_SITE_EXTRA_DELAY_MS : 1500;
-  await new Promise((r) => setTimeout(r, spaDelay));
+  // wait for SPA frameworks to initialize
+  await new Promise((r) => setTimeout(r, 1500));
 
   if (!safeGetTab(tabId)) { return tabId; }
 
@@ -379,14 +373,6 @@ async function warmTabs(tabIds) {
       await new Promise((r) => setTimeout(r, TAB_WARM_INTERVAL_MS));
     }
 
-    let originalTab = null;
-    try {
-      const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-      if (tabs && tabs.length > 0) { originalTab = tabs[0]; }
-    } catch (_) {
-      // query may fail if no focused window
-    }
-
     for (const tabId of validIds) {
       const info = safeGetTab(tabId);
       if (!info) { continue; }
@@ -394,25 +380,12 @@ async function warmTabs(tabIds) {
         || info.status === "timeout" || info.status === "skipped";
       if (terminal) { continue; }
 
+      // send warm-up message without switching tab focus —
+      // chrome.tabs.sendMessage still wakes the tab's JS briefly
       try {
-        await chrome.tabs.update(tabId, { active: true });
-        // let the tab wake up from background throttle
-        await new Promise((r) => setTimeout(r, TAB_WARM_FOCUS_MS));
-        // retry submit (Enter / click) while tab is still active
-        try { await chrome.tabs.sendMessage(tabId, { type: "ASKALL_WARM" }); } catch (_) {}
-        // let the page process the submit before switching away
-        await new Promise((r) => setTimeout(r, TAB_WARM_POST_ACTION_MS));
+        await chrome.tabs.sendMessage(tabId, { type: "ASKALL_WARM" });
       } catch (_) {
-        // tab already closed
-      }
-    }
-
-    if (originalTab) {
-      try {
-        await chrome.tabs.update(originalTab.id, { active: true });
-        await chrome.windows.update(originalTab.windowId, { focused: true });
-      } catch (_) {
-        // original tab may have been closed
+        // tab already closed or content script not ready
       }
     }
   }
@@ -574,9 +547,16 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     const validUrls = urls.filter(isValidUrl);
 
+    // close existing tabs for the same hostnames to prevent tab accumulation
+    const closePromises = validUrls.map((url) => {
+      try {
+        return closeExistingTabsForHostname(new URL(url).hostname);
+      } catch (_) { return Promise.resolve(); }
+    });
+
     saveToHistory(question, validUrls);
 
-    openInBatches(validUrls, question)
+    Promise.allSettled(closePromises).then(() => openInBatches(validUrls, question))
       .then((tabIds) => {
         isSending = false;
         sendResponse({
