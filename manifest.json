@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "AskAll",
-  "version": "1.2.0",
+  "name": "AskAll - Compare ChatGPT, Gemini, Claude, DeepSeek AI Responses",
+  "version": "1.3.0",
   "description": "Send one question to ChatGPT, Gemini, Claude, DeepSeek, Grok & 17+ AI chatbots at once. Compare responses side by side.",
   "permissions": [
     "tabs",
