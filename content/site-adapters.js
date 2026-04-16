@@ -94,15 +94,20 @@ window.__ASKALL_ADAPTERS = {
   },
 
   "gemini.google.com": {
-    inputSelector: '.ql-editor[contenteditable="true"], rich-textarea [contenteditable="true"], [contenteditable="true"], .input-area-container textarea',
-    submitSelector: 'button[aria-label="Send message"], button.send-button, .send-button-container button',
-    responseSelector: 'message-content, .model-response-text, .response-container, [class*="markdown"]',
-    thinkingSelector: '.loading-indicator, .thinking-indicator, model-response[is-streaming]',
-    useEnterToSubmit: false,
-    waitBeforeSubmit: 600,
+    inputSelector: 'rich-textarea .ql-editor[contenteditable="true"], rich-textarea [contenteditable="true"], .ql-editor[contenteditable="true"], [contenteditable="true"].ql-editor, .input-area-container textarea, div[contenteditable="true"]',
+    submitSelector: 'button[aria-label="Send message"], button[aria-label*="Send" i], button.send-button, .send-button-container button, button[data-testid*="send" i]',
+    responseSelector: 'message-content, .model-response-text, .response-container, [class*="markdown"], .response-content',
+    thinkingSelector: '.loading-indicator, .thinking-indicator, model-response[is-streaming], [class*="loading"], [class*="generating"]',
+    useEnterToSubmit: true,
+    waitBeforeSubmit: 800,
     fillInput(el, text) {
       el.focus();
+      // Gemini's rich-textarea needs robust event dispatch for its framework
+      // to register the text in its internal model
       __askall_fillContentEditable(el, text);
+      // dispatch additional input events so framework picks up the change
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+      el.dispatchEvent(new Event("change", { bubbles: true }));
     }
   },
 
@@ -306,14 +311,21 @@ window.__ASKALL_ADAPTERS = {
 
 
   "copilot.microsoft.com": {
-    inputSelector: 'textarea#userInput, textarea, [contenteditable="true"], [role="textbox"]',
-    submitSelector: 'button[aria-label="Submit"], button.submit, button[type="submit"], button[aria-label*="send" i]',
-    responseSelector: '[class*="response"], [class*="markdown"], [class*="assistant"], [class*="message"], [class*="content"]',
+    inputSelector: 'textarea#userInput, #searchbox textarea, textarea[name="q"], textarea, [contenteditable="true"], [role="textbox"]',
+    submitSelector: 'button[aria-label="Submit"], button[aria-label*="Send" i], button[aria-label*="submit" i], button.submit, button[type="submit"], button[data-testid*="send" i], button[data-testid*="submit" i]',
+    responseSelector: '[class*="response"], [class*="markdown"], [class*="assistant"], [class*="message"], [class*="content"], [class*="prose"]',
     thinkingSelector: '[class*="loading"], [class*="generating"], [class*="typing"], [class*="progress"], [class*="stop"]',
-    useEnterToSubmit: false,
+    useEnterToSubmit: true,
     waitBeforeSubmit: 800,
     fillInput(el, text) {
-      __askall_fillViaExecCommand(el, text);
+      if (el.tagName === "TEXTAREA" || el.tagName === "INPUT") {
+        __askall_fillViaExecCommand(el, text);
+        // also fire React-compatible events
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        el.dispatchEvent(new Event("change", { bubbles: true }));
+      } else {
+        __askall_fillViaExecCommand(el, text);
+      }
     }
   },
   "aistudio.xiaomimimo.com": {

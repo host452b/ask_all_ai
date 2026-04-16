@@ -1953,6 +1953,34 @@ button:focus:not(:focus-visible) {
   pointer-events: none;
 }
 
+/* ===== dump button in card ===== */
+.btn-dump {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.btn-dump:hover {
+  color: var(--text);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.btn-dump:active {
+  transform: scale(0.93);
+}
+
+.btn-dump:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 /* ===== export button ===== */
 .responses-actions {
   display: flex;

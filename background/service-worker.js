@@ -758,5 +758,31 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
 
+  // collect debug diagnostics from a single tab
+  if (msg.type === "ASKALL_DEBUG_SINGLE") {
+    const tabId = parseInt(msg.tabId, 10);
+    const info = activeTabs[tabId];
+    if (!info || isNaN(tabId)) {
+      sendResponse({ error: "tab not found" });
+      return false;
+    }
+    const entry = {
+      hostname: info.hostname,
+      url: info.url,
+      status: info.status,
+      response: info.response ? info.response.slice(0, 500) : null,
+      createdAt: new Date(info.createdAt).toISOString(),
+      doneAt: info.doneAt ? new Date(info.doneAt).toISOString() : null,
+      elapsedMs: info.doneAt ? info.doneAt - info.createdAt : Date.now() - info.createdAt,
+      question: currentQuestion || null,
+      pageDiag: null,
+    };
+    chrome.tabs.sendMessage(tabId, { type: "ASKALL_DEBUG" })
+      .then((diag) => { entry.pageDiag = diag; })
+      .catch(() => { entry.pageDiag = { error: "tab unreachable" }; })
+      .finally(() => { sendResponse(entry); });
+    return true;
+  }
+
   return false;
 });

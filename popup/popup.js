@@ -950,6 +950,7 @@
       </div>
       <div class="response-card-actions">
         <button class="btn-retry hidden" data-url="${escapeHtml(url)}">Retry</button>
+        <button class="btn-dump hidden">Dump</button>
         <button class="btn-copy-single">Copy</button>
       </div>
     `;
@@ -980,6 +981,7 @@
         this.textContent = "Retry";
         if (resp && resp.success) {
           this.classList.add("hidden");
+          card.querySelector(".btn-dump").classList.add("hidden");
           card.classList.remove("card-error");
           card.classList.add("collapsed");
           card.querySelector(".response-status").className = "response-status polling";
@@ -989,6 +991,26 @@
           prevDoneSet.delete(url);
           startPolling();
         }
+      });
+    });
+
+    card.querySelector(".btn-dump").addEventListener("click", function () {
+      const btn = this;
+      const tabId = card.dataset.tabId;
+      if (!tabId) { return; }
+      btn.textContent = "...";
+      btn.disabled = true;
+      sendMsg({ type: "ASKALL_DEBUG_SINGLE", tabId: tabId }, (entry) => {
+        btn.textContent = "Dump";
+        btn.disabled = false;
+        if (!entry || entry.error) { return; }
+        const json = JSON.stringify(entry, null, 2);
+        const blob = new Blob([json], { type: "application/json;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `askall-dump-${hostname}-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
       });
     });
 
@@ -1080,11 +1102,14 @@
       }
       timeStat.textContent = formatElapsed(info.elapsedMs);
 
-      // retry button visibility
+      // retry + dump button visibility
+      const dumpBtn = card.querySelector(".btn-dump");
       if (isError || isTimeout) {
         retryBtn.classList.remove("hidden");
+        if (dumpBtn) { dumpBtn.classList.remove("hidden"); }
       } else {
         retryBtn.classList.add("hidden");
+        if (dumpBtn) { dumpBtn.classList.add("hidden"); }
       }
 
       // done animation
