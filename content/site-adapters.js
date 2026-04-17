@@ -182,13 +182,19 @@ window.__ASKALL_ADAPTERS = {
 
   "chat.qwen.ai": {
     inputSelector: 'textarea.message-input-textarea, textarea[class*="message-input"], textarea',
-    submitSelector: 'button.send-button, .chat-prompt-send-button button, .message-input-right-button-send button',
+    // Qwen's send trigger is a DIV (not a button): div.message-input-right-button-send
+    submitSelector: '.message-input-right-button-send, button.send-button, .chat-prompt-send-button',
     responseSelector: '[class*="markdown"], [class*="message-content"], [class*="prose"], [class*="assistant"]',
-    thinkingSelector: 'button.stop-button, [class*="generating"], [class*="typing"]',
+    thinkingSelector: 'button.stop-button, [class*="generating"], [class*="typing"], [class*="stop"]',
     useEnterToSubmit: true,
     waitBeforeSubmit: 1200,
     fillInput(el, text) {
-      __askall_fillReactTextarea(el, text);
+      // Qwen's Vue binding needs real beforeinput events to update reactive
+      // state. The plain .value + Event("input") approach leaves the Vue model
+      // empty, so Enter-to-send silently does nothing.
+      __askall_fillViaExecCommand(el, text);
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+      el.dispatchEvent(new Event("change", { bubbles: true }));
     }
   },
 
@@ -206,14 +212,23 @@ window.__ASKALL_ADAPTERS = {
   },
 
   "chat.mistral.ai": {
-    inputSelector: 'textarea, [contenteditable="true"], [role="textbox"]',
-    submitSelector: 'button[type="submit"], button[aria-label*="Send" i], button[class*="send"]',
+    // Mistral uses ProseMirror; its contenteditable is a DOM property, not an
+    // attribute, so [contenteditable="true"] doesn't match reliably. The bare
+    // textarea selector would also match a hidden body-level textarea shim.
+    inputSelector: 'div.ProseMirror, .tiptap[contenteditable], [role="textbox"]:not([aria-hidden="true"]), textarea:not([aria-hidden="true"]):not([tabindex="-1"])',
+    // Mistral's send button only renders when input has text + user is signed
+    // in, and has no stable aria-label. Use Enter-to-submit instead.
+    submitSelector: 'button[type="submit"], button[aria-label*="Send" i], button[aria-label*="Submit" i], button[data-testid*="send" i]',
     responseSelector: '[class*="prose"], [class*="markdown"], [class*="assistant"], [class*="message-content"]',
     thinkingSelector: '[class*="loading"], [class*="generating"], [class*="stop"], [class*="typing"]',
-    useEnterToSubmit: false,
-    waitBeforeSubmit: 600,
+    useEnterToSubmit: true,
+    waitBeforeSubmit: 800,
     fillInput(el, text) {
+      el.focus();
       __askall_fillViaExecCommand(el, text);
+      // ProseMirror relies on beforeinput/input events that execCommand fires;
+      // also nudge framework state just in case
+      el.dispatchEvent(new Event("input", { bubbles: true }));
     }
   },
   "duck.ai": {
