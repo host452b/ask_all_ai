@@ -30,7 +30,12 @@
   const STABILITY_THRESHOLD = 10;
   const STABILITY_THRESHOLD_FORCE = 12;
   const POLL_INTERVAL_MS = 6000;
-  const MAX_POLL_DURATION_MS = 180000;
+  // hard cap (prevents runaway on truly stuck tabs)
+  const MAX_POLL_DURATION_MS = 600000;
+  // idle timeout: if response text hasn't changed for this long, treat as stuck.
+  // this lets slow-streaming responses on weak networks keep going past the old
+  // 3-minute absolute cap, while still catching stalls within ~90s of silence.
+  const IDLE_TIMEOUT_MS = 90000;
 
   // ============================================================
   //  HELPERS
@@ -433,9 +438,17 @@
     let lastSentText = "";
     const preExistingText = preExistingPageText;
     const startTime = Date.now();
+    let lastChangeTime = startTime;
 
     pollingTimer = setInterval(() => {
+      // hard cap: runaway protection
       if (Date.now() - startTime > MAX_POLL_DURATION_MS) {
+        stopPolling();
+        sendStatus("timeout", extractLatestResponse());
+        return;
+      }
+      // idle cap: nothing has changed for too long — give up
+      if (Date.now() - lastChangeTime > IDLE_TIMEOUT_MS) {
         stopPolling();
         sendStatus("timeout", extractLatestResponse());
         return;
@@ -451,6 +464,12 @@
         stabilityCounter++;
       } else {
         stabilityCounter = 0;
+      }
+
+      // bump activity timer when something is still moving: response text
+      // changes, or the "thinking" indicator is visible (e.g. pre-TTFB waits)
+      if (currentText !== lastResponseText || thinking) {
+        lastChangeTime = Date.now();
       }
 
       lastResponseText = currentText;
